@@ -47,9 +47,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
           {props.suffix && (
             <div
-              className={cn("absolute top-1/2 px-3 right-0 text-sm", {
-                "cursor-pointer": !!props.onPressSuffix,
-              })}
+              className={cn(
+                "absolute top-1/2 px-3 inset-y-0 right-0 flex items-center justify-center text-sm",
+                {
+                  "cursor-pointer": !!props.onPressSuffix,
+                }
+              )}
               onClick={() => props.onPressSuffix?.()}
             >
               {_renderPrefixSuffix(props.suffix)}

@@ -22,6 +22,7 @@ export const authApi = createApi({
       query: (body) => ({
         url: "/auth/sign-up",
         method: "POST",
+        body,
       }),
     }),
   }),

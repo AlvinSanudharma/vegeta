@@ -8,6 +8,10 @@ import { cn } from "@/lib/utils";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, SubmitHandler } from "react-hook-form";
+import { useRegisterMutation } from "@/services/auth";
+import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 type UserAuthForm = {
   email: string;
@@ -30,6 +34,14 @@ function SignUpForm() {
   const [showConfirmationPassword, setShowConfirmationPassword] =
     useState(false);
 
+  const searchParams = useSearchParams();
+
+  const [registerMutation] = useRegisterMutation();
+
+  const router = useRouter();
+
+  const { toast } = useToast();
+
   const {
     register,
     handleSubmit,
@@ -38,8 +50,35 @@ function SignUpForm() {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: UserAuthForm) => {
-    console.log(data);
+  const onSubmit = async (data: UserAuthForm) => {
+    try {
+      const res = await registerMutation(data).unwrap();
+
+      if (res.success) {
+        const user = await signIn("credentials", {
+          email: data.email,
+          password: data.password,
+          callbackUrl: searchParams.get("callbackUrl") || "/",
+          redirect: false,
+        });
+
+        router.push(user?.url || "/");
+      } else {
+        toast({
+          title: "Something went wrong",
+          description: "Please check your email and password",
+          variant: "destructive",
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Something went wrong",
+        description: "An error occurred",
+        variant: "destructive",
+        duration: 2000,
+      });
+    }
   };
 
   return (

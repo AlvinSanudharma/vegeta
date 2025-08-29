@@ -47,6 +47,18 @@ interface HeaderProps {}
 const CommonHeader: React.FC<HeaderProps> = () => {
   const { data: session } = useSession();
 
+  function getAvatarUrl(name: string) {
+    if (!name)
+      return "https://ui-avatars.com/api/?name=Unknown&background=random&length=1";
+
+    const wordCount = name.trim().split(" ").length;
+    const length = wordCount === 1 ? 1 : 2;
+
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      name
+    )}&background=random&length=${length}`;
+  }
+
   return (
     <>
       <div className="w-extra flex flex-col items-center">
@@ -131,9 +143,7 @@ const CommonHeader: React.FC<HeaderProps> = () => {
               </CommonNotificationBadge>
               <div className="w-[42px] h-[42px] rounded-full relative overflow-hidden">
                 <Image
-                  src={`https://ui-avatars.com/api/?name=${encodeURIComponent(
-                    session.user?.name || ""
-                  )}&background=random`}
+                  src={getAvatarUrl(session.user?.name)}
                   layout="fill"
                   alt=""
                   objectFit="cover"
